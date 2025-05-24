@@ -1,6 +1,12 @@
 package Cliente.FactoryMethod;
 
-public class ClienteFactory {
+import Cliente.Cliente;
+import Cliente.Persona;
 
+public class ClienteFactory  extends  PersonaFactory{
 
+    public Persona crearPersona(){
+
+        return new Cliente();
+    }
 }
