@@ -48,7 +48,7 @@ public class GestionarPlatillo {
         }else {
             System.out.println("Lista de Platillos:");
             for (Platillo platillo : platillos) {
-                System.out.println("- " + platillo.getNombre_platillo() + ": $" + platillo.getPrecio() +" " + platillo.getAcompañantes_platillo() + " " + platillo.getCategoria().getNombre_categoria() + " " + platillo.getCategoria().getDescripcion_categoria());
+                System.out.println(" - " + platillo.getCodigo_platillo() + " " + platillo.getNombre_platillo() + ": $" + platillo.getPrecio() +" " + platillo.getAcompañantes_platillo() + " " + platillo.getCategoria().getNombre_categoria() + " " + platillo.getCategoria().getDescripcion_categoria());
             }
         }
     }

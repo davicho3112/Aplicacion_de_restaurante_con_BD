@@ -2,5 +2,5 @@ package Restaurante.Observador;
 
 public interface Observador {
 
-    void actualizar(String estado);
+    void actualizarOrden(String estado);
 }

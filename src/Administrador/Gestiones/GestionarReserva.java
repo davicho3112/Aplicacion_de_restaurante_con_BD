@@ -8,11 +8,11 @@ import java.util.List;
 
 public class GestionarReserva {
 
-    private Reserva administrar_reservas;
-    private List<Date> fechas_disponibles;
+    public Reserva administrar_reservas;
+    public List<Date> fechas_disponibles;
 
     public GestionarReserva() {
-        this.administrar_reservas = new Reserva();
+
         fechas_disponibles = new ArrayList<>();
     }
 

@@ -2,9 +2,14 @@
 import Administrador.AdministrarRestaurante;
 import Cliente.FactoryMethod.ClienteFactory;
 import Cliente.FactoryMethod.PersonaFactory;
+import Cliente.Informacion.NumeroTelefono;
 import Cliente.Persona;
+import Restaurante.Menu;
+import Restaurante.Orden;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Main {
@@ -30,11 +35,52 @@ public class Main {
         switch(opcion_usuario){
 
             case 1:
+
+                Menu menu = new Menu();
+                Scanner leerDato = new Scanner(System.in);
+
                 //1. Si ingresa el cliente
-                // Para la creacion de clientes usando el patron Factory Method
-                PersonaFactory clienteFactory = new ClienteFactory();
+                System.out.print("Ingrese su nombre: ");
+                String nombreCliente = leerOpcion.nextLine();
+                System.out.print("Ingrese su fecha de nacimiento (dd/MM/yyyy): ");
+                String fecha = leerOpcion.nextLine();
+                Date fechaNacimiento = new SimpleDateFormat("dd/MM/yyyy").parse(fecha);
+                System.out.print("Ingrese su DNI: ");
+                int dni = leerOpcion.nextInt();
+                leerOpcion.nextLine(); // Consumir el salto de línea
+                System.out.print("Ingrese el prefijo  del telefono : ");
+                int prefijo = leerOpcion.nextInt();
+                System.out.print("Ingrese su numero de telefono: ");
+                int numeroTelefono = leerOpcion.nextInt();
+                System.out.print("Ingrese el tipo de uso para el telefono: ");
+                String tipoUso = leerOpcion.nextLine();
+
+                //Se registra el cliente al sistema
+                NumeroTelefono contacto = new NumeroTelefono();
+                PersonaFactory clienteFactory = new ClienteFactory(dni,fechaNacimiento, nombreCliente, contacto);
                 Persona cliente = clienteFactory.crearPersona();
                 cliente.mostrarDatos();  // Usuario tipo Cliente
+                Orden orden = new Orden();
+
+                //Interaccion del cliente con el sistema para solicitar un platillo o reservar una mesa
+                System.out.println("BIENVENIDO CLIENTE AL RESTAURANTE ROYAL-RESTAURANT");
+
+                    System.out.println("Desea realizar una reserva? (1. Sí / 2. No)");
+                    System.out.print("Seleccione una opción: ");
+                    int reserva = leerDato.nextInt();
+
+                    if(reserva == 1) {
+
+                        //Se implementa la logica para reservar los asiento o mesas que el cliente solicite
+                        //Se implementa la logica para mostrar las fechas disponibles llamando al metodo mostrarFechasDisponibles
+                        orden.Reservar();
+                    }
+
+                    //El cliente solicita un platillo
+                    orden.solicitarPlatillo();
+
+                    // Se le muetra la factura al cliente
+                    orden.mostrarFactura();
 
                 break;
 
