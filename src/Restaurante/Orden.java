@@ -4,8 +4,7 @@ import Administrador.Gestiones.GestionarReserva;
 import Cliente.Cliente;
 import Restaurante.Observador.Observador;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class Orden implements Observador {
@@ -21,15 +20,21 @@ public class Orden implements Observador {
     String metodo_pago = "";
     Pago pago;
 
-
-    public Orden() {
+    public Orden(GestionarReserva fecha_reserva, Menu menu) {
+        this.fecha_reserva = fecha_reserva;
+        this.menu = menu;
+        this.reserva_cliente = new Reserva();
+        this.factura_cliente = new Factura();
         estadoOrden = "Pendiente";
         leerDato = new Scanner(System.in);
         contPago = 0;
     }
 
-    public void Reservar() {
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
 
+    public void Reservar() {
         mostrarFechasDisponibles();
 
         System.out.println("Por favor, elija una fecha :");
@@ -60,49 +65,31 @@ public class Orden implements Observador {
         }else{
             fecha_reserva.administrar_reservas.setNum_asientos(num_asientos);
         }
-
     }
 
     public void solicitarPlatillo() {
-
         Scanner leerDato = new Scanner(System.in);
         int platillo_seleccionar = 0;
         int opcion = 0;
-        int tiempo_espera = 0;
 
-
-        System.out.println("Estos son los platillos que ofrecemos");
+        System.out.println("╔══════════════════════════════════════════════╗");
+        System.out.println("║         ESTOS SON LOS PLATILLOS             ║");
+        System.out.println("╚══════════════════════════════════════════════╝");
         menu.mostrarMenu();
 
-            do {
-                //Se le muestra al cliente el menu y se le pide que seleccione un platillo
-                System.out.println("Por favor, elija un platillo del menú:");
-                System.out.print("Seleccione el número del platillo: ");
-                platillo_seleccionar = leerDato.nextInt();
-                menu.seleccionarPlatillo(platillo_seleccionar); // Por medio de este metodo el cliente va a tratar de seleccionar un platillo
+        do {
+            System.out.println("Por favor, elija un platillo del menú:");
+            System.out.print("Seleccione el número del platillo: ");
+            platillo_seleccionar = leerDato.nextInt();
+            menu.seleccionarPlatillo(platillo_seleccionar);
 
-                System.out.println("¿Desea seleccionar otro platillo? (1. Sí / 2. No)");
-                System.out.print("Seleccione una opción: ");
-                opcion = leerDato.nextInt();
-            } while (opcion != 2);
+            System.out.println("¿Desea seleccionar otro platillo? (1. Sí / 2. No)");
+            System.out.print("Seleccione una opción: ");
+            opcion = leerDato.nextInt();
+        } while (opcion != 2);
 
-        //Procesar la preparacion del plantillo
-        //Un bucle que simule el tiempo de espera para la preparacion del platillo
-        while (tiempo_espera < 5) {
-            System.out.println("Esperando...");
-            try {
-                Thread.sleep(1000); // Espera 1 segundo
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            tiempo_espera++;
-        }
+        int total = factura_cliente.calcularPago(menu.compras_platillos);
 
-        System.out.println(estadoOrden);
-
-        int total = factura_cliente.calcularPago(menu.compras_platillos); // Se calcula el total de la factura
-
-        //Se le pregunta al cliente por el metodo de pago
         System.out.println("¿Cómo desea pagar? (1. Efectivo / 2. Tarjeta)");
         System.out.print("Seleccione una opción: ");
         int opcion_pago = leerDato.nextInt();
@@ -115,38 +102,74 @@ public class Orden implements Observador {
         }
         contPago++;
 
-        pago = new Pago(contPago,metodo_pago, total);
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Procesando su pedido...");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
-        //Se le muetra la factura al cliente
+        pago = new Pago(contPago, metodo_pago, total);
+
         mostrarFactura();
-
-        menu.compras_platillos.clear();// Cuando ya culmine las compras del cliente se limpian los platillos seleccionados
+        menu.compras_platillos.clear();
     }
 
     public void mostrarFactura() {
-
-        System.out.println("Factura:");
-        System.out.println("Cliente: " + cliente.getNombre());
-        System.out.println("Fecha de reserva: " + reserva_cliente.getFecha_reserva());
-        System.out.println("Platillos seleccionados:");
-        for (Platillo platillo : menu.compras_platillos) {
-            System.out.println(" - " + platillo.getCodigo_platillo() + " " + platillo.getNombre_platillo() + ": $" + platillo.getPrecio() +" " + platillo.getAcompañantes_platillo() + " " + platillo.getCategoria().getNombre_categoria() + " " + platillo.getCategoria().getDescripcion_categoria());
+        System.out.println("\n╔══════════════════════════════════════════════════════════════════════════════╗");
+        System.out.println("║                            RESUMEN DE SU FACTURA                          ║");
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝");
+        if (cliente != null) {
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            System.out.printf("│ %-15s: %-30s │\n", "Cliente", cliente.getNombre());
+            System.out.printf("│ %-15s: %-30d │\n", "DNI", cliente.getDni());
+            System.out.printf("│ %-15s: %-30s │\n", "Nacimiento", formato.format(cliente.getFecha_nacimiento()));
+            System.out.printf("│ %-15s: %-30s │\n", "Contacto", (cliente.getNumero().isEmpty() ? "N/A" : cliente.getNumero().get(0)));
         }
-        System.out.println("Total a pagar: $" + pago.getTotal_pago());
-        System.out.println("Método de pago: " + metodo_pago);
-
+        System.out.println("├──────────────────────────────────────────────────────────────────────────────┤");
+        if (reserva_cliente.getFecha_reserva() != null) {
+            SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+            System.out.printf("│ %-20s: %-30s │\n", "Fecha reservada", formato.format(reserva_cliente.getFecha_reserva()));
+            System.out.printf("│ %-20s: %-30d │\n", "Mesas reservadas", fecha_reserva.administrar_reservas.getNum_mesas());
+            System.out.printf("│ %-20s: %-30d │\n", "Asientos reservados", fecha_reserva.administrar_reservas.getNum_asientos());
+        } else {
+            System.out.println("│ No se realizó reserva.                                                    │");
+        }
+        System.out.println("├──────────────────────────────────────────────────────────────────────────────┤");
+        System.out.println("│ Platillos seleccionados:                                                    │");
+        if (menu.compras_platillos.isEmpty()) {
+            System.out.println("│   No hay platillos seleccionados.                                           │");
+        } else {
+            for (Platillo platillo : menu.compras_platillos) {
+                System.out.printf("│   - %-20s | $%-7.2f | %-10s | %-10s │\n",
+                        platillo.getNombre_platillo(),
+                        platillo.getPrecio(),
+                        platillo.getAcompañantes_platillo(),
+                        platillo.getCategoria().getNombre_categoria());
+            }
+        }
+        System.out.println("├──────────────────────────────────────────────────────────────────────────────┤");
+        System.out.printf("│ %-20s: $%-30s │\n", "Total a pagar", (pago != null ? pago.getTotal_pago() : "0"));
+        System.out.printf("│ %-20s: %-30s │\n", "Método de pago", (metodo_pago.isEmpty() ? "No seleccionado" : metodo_pago));
+        System.out.println("╚══════════════════════════════════════════════════════════════════════════════╝\n");
     }
 
-    private void mostrarFechasDisponibles() {
-
-        System.out.println("Estas son las fechas disponibles para reservar: ");
-        for (int i = 0; i < fecha_reserva.fechas_disponibles.size(); i++) {
-            System.out.println("Fecha " + (i + 1) + ": " + fecha_reserva.fechas_disponibles.get(i));
+    public void mostrarFechasDisponibles() {
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy");
+        if (fecha_reserva.fechas_disponibles.isEmpty()) {
+            System.out.println("No hay fechas disponibles para reservar.");
+        } else {
+            System.out.println("Fechas disponibles:");
+            for (int i = 0; i < fecha_reserva.fechas_disponibles.size(); i++) {
+                System.out.printf("  %-2d. %s\n", (i + 1), formato.format(fecha_reserva.fechas_disponibles.get(i)));
+            }
         }
+        System.out.println("═══════════════════════════════════════════════════════════════════════════════");
     }
 
     public void actualizarOrden(String estado) {
-        // Lógica para actualizar el estado de la orden
         System.out.println("Estado de la orden actualizado: " + estado);
         this.estadoOrden = estado;
     }

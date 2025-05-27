@@ -1,36 +1,34 @@
 package Restaurante;
 
 import Administrador.Gestiones.GestionarPlatillo;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class Menu {
 
-    GestionarPlatillo menuPlatillos;
-    List<Platillo> compras_platillos;
+    public GestionarPlatillo menuPlatillos;
+    public List<Platillo> compras_platillos;
 
-    public Menu() {
-        menuPlatillos = new GestionarPlatillo();
-        compras_platillos = new ArrayList<>();
+    public Menu(GestionarPlatillo menuPlatillos) {
+        this.menuPlatillos = menuPlatillos;
+        this.compras_platillos = new ArrayList<>();
     }
 
-    /**
-     * Mostrar el menú del restaurante con los platillos disponibles.
-     * @param
-     */
-    public void mostrarMenu(){
-
-        System.out.println("Este es el menu del restaurante: ");
+    public void mostrarMenu() {
+        System.out.println("\n==============================================================================================");
+        System.out.printf("| %-3s | %-20s | %-10s | %-15s | %-15s | %-20s |\n", "ID", "Nombre", "Precio", "Acompañantes", "Categoría", "Descripción");
+        System.out.println("----------------------------------------------------------------------------------------------");
         menuPlatillos.mostrarPlatillos();
     }
 
-
-    public void seleccionarPlatillo(int codigoPlatillo) {
-
-        // Lógica para seleccionar un platillo del menú
-        System.out.println("Platillo seleccionado: " + menuPlatillos.platillos.get(codigoPlatillo).getNombre_platillo());
-        compras_platillos.add(menuPlatillos.platillos.get(codigoPlatillo)); // Se agregan los platillos seleccionados a la lista de compras
-
+    public void seleccionarPlatillo(int numeroPlatillo) {
+        int index = numeroPlatillo - 1;
+        if (index >= 0 && index < menuPlatillos.platillos.size()) {
+            Platillo seleccionado = menuPlatillos.platillos.get(index);
+            System.out.println("Platillo seleccionado: " + seleccionado.getNombre_platillo());
+            compras_platillos.add(seleccionado);
+        } else {
+            System.out.println("Opción de platillo no válida.");
+        }
     }
 }
